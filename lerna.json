@@ -1,0 +1,10 @@
+{
+  "version": "independent",
+  "npmClient": "pnpm",
+  "packages": ["packages/*"],
+  "command": {
+    "version": {
+      "message": "ci(release): publish"
+    }
+  }
+}
