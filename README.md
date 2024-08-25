@@ -1,16 +1,16 @@
 # Mini Command Line Tool
 
-提供一个通用能力的 CLI 框架
+Provides a CLI framework with general capabilities.
 
-## 安装
+## Installation
 
 ```bash
 npm i -D @hong97/mini-cli
 ```
 
-## 运行
+## Running
 
-在 `package.json` 的 `script` 中添加：
+Add to the `script` in `package.json`:
 
 ```json
 {
@@ -21,21 +21,21 @@ npm i -D @hong97/mini-cli
 
 ```
 
-然后运行：
+Then run:
 
 ```bash
 npm run cli
 ```
 
-你可以携带 CLI 的名字直接运行:
+You can run the CLI directly with its name:
 
 ```bash
 npm run cli -- <name>
 ```
 
-## 配置
+## Configuration
 
-安装完成后，在你的项目目录内新建一个 `.mini-cli` 文件夹
+After installation, create a `.mini-cli` folder in your project directory:
 
 ```
 |---
@@ -43,9 +43,9 @@ npm run cli -- <name>
   |-- ...
 ```
 
-然后在在文件夹中新建一个 `js` 文件即可创建一个 CLI
+Then create a js file in the folder to create a CLI
 
-例如，创建一个 `build.js` 文件：
+For example, create a `build.js` file:
 
 ```
 |---
@@ -53,17 +53,17 @@ npm run cli -- <name>
     |-- build.js
 ```
 
-在这里创建你的 CLI 运行逻辑：
+Create your CLI logic here:
 
 ```js
 // .mini-cli/build.js
 
 module.exports = {
 
-  // CLI 的名字，必填，可以直接使用 mini-cli <name> 触发
+  // The name of the CLI, required, can be triggered directly with mini-cli <name>
   name: 'build',
 
-  // alias, 可选，支持 mini-cli <alias> 触发
+  // alias, optional, supports triggering with mini-cli <alias>
   alias: 'bd',
 
   async beforeRun() {
@@ -78,29 +78,25 @@ module.exports = {
 }
 ```
 
-当你成功创建并配置后，执行 `npm run cli` 就可以看到它了，并可以选择执行
+After successfully creating and configuring, execute npm run cli to see it, and you can choose to execute
 
-![2](./images/2.png)
-
-你也可以使用 `npm run cli -- <name>` 或 `npm run cli -- <alias>` 来直接运行某一 CLI
+You can also run a specific CLI directly with `npm run cli -- <name>` or `npm run cli -- <alias>`
 
 ---
 
-我将 CLI 的执行抽象成了 3 个步骤，分别是：`beforeRun()`, `questions` 以及 `run()`
+I abstracted the execution of the CLI into 3 steps: `beforeRun()`, `questions`, and `run()`.
 
-CLI 通常会包含 Q&A 式的交互逻辑，例如下图，这些内容可以在 `questions` 中配置
+CLI often includes Q&A style interaction logic, which can be configured in `questions`:
 
-![1](./images/1.png)
-
-> 这 3 个步骤并不是每一步都需要，如果没有必要，可以不设置
+> These 3 steps are not necessary for every step, you can omit them if not needed
 
 ### async beforeRun()
 
-`beforeRun()` 在 `questions` 之前执行，你可以在这里设置一些 context 供后面消费
+`beforeRun()` is executed before `questions`, where you can set some context for later use.
 
 ### questions
 
-模板化的配置 `questions`，例如上面图片的问题可以这样配置:
+Template configuration questions, for example, the `questions` can be configured like this:
 
 ```js
 const { prompts } = require('@hong97/mini-cli')
@@ -151,36 +147,36 @@ module.exports = {
 }
 ```
 
-这里的 `prompts` 类型以及 `options` 设置参考 [inquirer](https://www.npmjs.com/package/inquirer)
+The `prompts` types and `options` settings refer to [inquirer](https://www.npmjs.com/package/inquirer)
 
-在 `options` 中，我们可以配置是否跳过某一问题，使用 `skip()` 字段，若返回 `true` 则跳过该问题，反之不跳过
+In `options`, you can configure whether to skip a question with the `skip()` field, if it returns `true`, the question is skipped, otherwise not
 
-此外，还可以通过 `default` 配合 `timeout` 字段设置某一问题是否有默认值，以及超时自动继续
+Additionally, you can set a default value for a question and automatically continue after a timeout with the `default` and `timeout` fields
 
-每一个 `question` 都有一个 `handler()` 函数，它接受问题的结果，并留给你处理
+Each `question` has a `handler()` function, which receives the result of the question for you to handle
 
-每个问题的 `handler()` **是在问题结果给到后立刻执行的**，而不是在所有问题收集完成后执行。
+The `handler()` of each question is **executed immediately after the result is given**, not after all questions are collected.
 
 ### async run()
 
-`run()` 在问题收集完成后（若果有）执行，在这里你可以消费你的问题结果并执行相应的逻辑
+`run()` is executed after the questions are collected (if any), where you can consume your question results and execute the corresponding logic.
 
-## this 上下文
+## this Context
 
-在 CLI 运行中，所有上下文都储存在 `this` 中。从上面可以看到，在 `questions` 阶段，我们在问题的 `handler()` 回调中将结果存储在了 `this` 中，它可以在后面的问题 `handler()` 中消费。
+In the CLI run, all contexts are stored in `this`. As seen above, during the `questions` stage, we store the results in `this` in the `handler()` callback of the question, which can be consumed in the `handler()` of later questions.
 
-在 `beforeRun()`, `questions` 以及 `run()` 阶段共享的是一个 `this` 上下文，这意味着你可以在不同阶段传递信息。
+The same `this` context is shared across `beforeRun()`, `questions`, and `run()` stages, meaning you can pass information between different stages.
 
-此外，`this` 中默认携带了些只读信息，它们包括：
+Additionally, this carries some read-only information by default, including:
 
 - git
-  - branch: 分支名
-  - email: git 邮箱
+  - branch: branch name
+  - email: git email
 
-## 工具函数
+## Utility functions
 
-miniCLI 还提供了一些通用的工具函数，你可以直接引用
+`mini-cli` also provides some general utility functions:
 
 ```js
-const { log, exit, triggerPipeline } = require('@hong97/mini-cli')
+const { log, exit } = require('@hong97/mini-cli')
 ```
